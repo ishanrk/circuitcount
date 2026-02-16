@@ -1,0 +1,28 @@
+{
+  "entries": [
+    {
+      "name": "sat-small",
+      "cnf": "examples/sat.cnf",
+      "witness": "examples/sat.wtns",
+      "proof": "artifacts/sat.proof.json"
+    },
+    {
+      "name": "unsat-small",
+      "cnf": "examples/unsat.cnf",
+      "witness": "examples/unsat.wtns",
+      "proof": "artifacts/unsat.proof.json"
+    },
+    {
+      "name": "sat-large",
+      "cnf": "examples/large_sat.cnf",
+      "witness": "examples/large_sat.wtns",
+      "proof": "artifacts/large_sat.proof.json"
+    },
+    {
+      "name": "unsat-large",
+      "cnf": "examples/large_unsat.cnf",
+      "witness": "examples/large_unsat.wtns",
+      "proof": "artifacts/large_unsat.proof.json"
+    }
+  ]
+}

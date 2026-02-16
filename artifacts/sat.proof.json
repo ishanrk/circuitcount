@@ -1,126 +1,134 @@
 {
-  "prime": 998244353,
-  "seed": 7,
-  "num_vars": 3,
-  "num_clauses": 3,
-  "grid_bits": 3,
-  "clause_weights": [
-    588177856,
-    479716855,
-    70680866
-  ],
-  "boolean_weights": [
-    733120530,
-    712578128,
-    16322215
-  ],
-  "grid_root": "94496fa9c5b3c58a69e7d7977469907ef6b8180c56b8074c6253c6135f61293c",
-  "round_roots": [
-    "94496fa9c5b3c58a69e7d7977469907ef6b8180c56b8074c6253c6135f61293c",
-    "81bea7327f50ab733e767ef1e0d3622989e907b720e6f789132ecb1a8fe688ff",
-    "06f8b0ca880490cef88bed69dc246c69597dba167f9587cef9927cf9f3fda54c",
-    "ea9b15e8763111960e21daf4e62e9fe5a56c3226604ab11378b4e98b42b36473"
-  ],
-  "rounds": [
-    {
-      "round": 0,
-      "challenge": 316213093,
-      "query_index": 3,
-      "left_opening": {
-        "index": 6,
-        "value": 70680866,
-        "siblings": [
-          "253dccadd5fe79bc33b0492819c7523cddd2d057a1489134f56a8a96046937a2",
-          "6ebbf6dc580e63abafd7d99aaaadf87d0631a298b640f66a4afb10e54d603963",
-          "14512230aae2af4110f190a27207945803846b8be1460675de231032253bf51d"
-        ]
+  "proof": {
+    "prime": 998244353,
+    "seed": 7,
+    "num_vars": 3,
+    "num_clauses": 3,
+    "grid_bits": 3,
+    "clause_weights": [
+      588177856,
+      479716855,
+      70680866
+    ],
+    "boolean_weights": [
+      733120530,
+      712578128,
+      16322215
+    ],
+    "grid_root": "94496fa9c5b3c58a69e7d7977469907ef6b8180c56b8074c6253c6135f61293c",
+    "round_roots": [
+      "94496fa9c5b3c58a69e7d7977469907ef6b8180c56b8074c6253c6135f61293c",
+      "81bea7327f50ab733e767ef1e0d3622989e907b720e6f789132ecb1a8fe688ff",
+      "06f8b0ca880490cef88bed69dc246c69597dba167f9587cef9927cf9f3fda54c",
+      "ea9b15e8763111960e21daf4e62e9fe5a56c3226604ab11378b4e98b42b36473"
+    ],
+    "rounds": [
+      {
+        "round": 0,
+        "challenge": 316213093,
+        "query_index": 3,
+        "left_opening": {
+          "index": 6,
+          "value": 70680866,
+          "siblings": [
+            "253dccadd5fe79bc33b0492819c7523cddd2d057a1489134f56a8a96046937a2",
+            "6ebbf6dc580e63abafd7d99aaaadf87d0631a298b640f66a4afb10e54d603963",
+            "14512230aae2af4110f190a27207945803846b8be1460675de231032253bf51d"
+          ]
+        },
+        "right_opening": {
+          "index": 7,
+          "value": 70680866,
+          "siblings": [
+            "253dccadd5fe79bc33b0492819c7523cddd2d057a1489134f56a8a96046937a2",
+            "6ebbf6dc580e63abafd7d99aaaadf87d0631a298b640f66a4afb10e54d603963",
+            "14512230aae2af4110f190a27207945803846b8be1460675de231032253bf51d"
+          ]
+        },
+        "next_opening": {
+          "index": 3,
+          "value": 70680866,
+          "siblings": [
+            "8d36dd92d8145d23d4b2dd40d87f3bf6fcf2574ead969ad062ecfc2c204f4443",
+            "121f65b24e9b886a7e37e879285f1888b0c3bd9b3f0cc096e1e5e857131bef47"
+          ]
+        }
       },
-      "right_opening": {
-        "index": 7,
-        "value": 70680866,
-        "siblings": [
-          "253dccadd5fe79bc33b0492819c7523cddd2d057a1489134f56a8a96046937a2",
-          "6ebbf6dc580e63abafd7d99aaaadf87d0631a298b640f66a4afb10e54d603963",
-          "14512230aae2af4110f190a27207945803846b8be1460675de231032253bf51d"
-        ]
+      {
+        "round": 1,
+        "challenge": 568383495,
+        "query_index": 1,
+        "left_opening": {
+          "index": 2,
+          "value": 249464933,
+          "siblings": [
+            "253dccadd5fe79bc33b0492819c7523cddd2d057a1489134f56a8a96046937a2",
+            "121f65b24e9b886a7e37e879285f1888b0c3bd9b3f0cc096e1e5e857131bef47"
+          ]
+        },
+        "right_opening": {
+          "index": 3,
+          "value": 70680866,
+          "siblings": [
+            "8d36dd92d8145d23d4b2dd40d87f3bf6fcf2574ead969ad062ecfc2c204f4443",
+            "121f65b24e9b886a7e37e879285f1888b0c3bd9b3f0cc096e1e5e857131bef47"
+          ]
+        },
+        "next_opening": {
+          "index": 1,
+          "value": 446109864,
+          "siblings": [
+            "02dd030ae627118e1dfa07e35dfc77745fcd25c32e0976be00f67731bbfb4556"
+          ]
+        }
       },
-      "next_opening": {
-        "index": 3,
-        "value": 70680866,
-        "siblings": [
-          "8d36dd92d8145d23d4b2dd40d87f3bf6fcf2574ead969ad062ecfc2c204f4443",
-          "121f65b24e9b886a7e37e879285f1888b0c3bd9b3f0cc096e1e5e857131bef47"
-        ]
+      {
+        "round": 2,
+        "challenge": 329621580,
+        "query_index": 0,
+        "left_opening": {
+          "index": 0,
+          "value": 466794824,
+          "siblings": [
+            "366cff4068d5388705b278497043660b2758a0c1a98ac8d0c39e4331e1ba0408"
+          ]
+        },
+        "right_opening": {
+          "index": 1,
+          "value": 446109864,
+          "siblings": [
+            "02dd030ae627118e1dfa07e35dfc77745fcd25c32e0976be00f67731bbfb4556"
+          ]
+        },
+        "next_opening": {
+          "index": 0,
+          "value": 847462977,
+          "siblings": []
+        }
       }
+    ],
+    "witness_index": 5,
+    "witness_point": [
+      1,
+      0,
+      1
+    ],
+    "witness_opening": {
+      "index": 5,
+      "value": 0,
+      "siblings": [
+        "a5df96fa32b87fcfcca5338891e20929ceffb2cf7787ca8863953fc23fbfeec2",
+        "a01f019fa8df420b6a1895802bfe7f29463bd6832eecd5083189f08ebc6de787",
+        "14512230aae2af4110f190a27207945803846b8be1460675de231032253bf51d"
+      ]
     },
-    {
-      "round": 1,
-      "challenge": 568383495,
-      "query_index": 1,
-      "left_opening": {
-        "index": 2,
-        "value": 249464933,
-        "siblings": [
-          "253dccadd5fe79bc33b0492819c7523cddd2d057a1489134f56a8a96046937a2",
-          "121f65b24e9b886a7e37e879285f1888b0c3bd9b3f0cc096e1e5e857131bef47"
-        ]
-      },
-      "right_opening": {
-        "index": 3,
-        "value": 70680866,
-        "siblings": [
-          "8d36dd92d8145d23d4b2dd40d87f3bf6fcf2574ead969ad062ecfc2c204f4443",
-          "121f65b24e9b886a7e37e879285f1888b0c3bd9b3f0cc096e1e5e857131bef47"
-        ]
-      },
-      "next_opening": {
-        "index": 1,
-        "value": 446109864,
-        "siblings": [
-          "02dd030ae627118e1dfa07e35dfc77745fcd25c32e0976be00f67731bbfb4556"
-        ]
-      }
-    },
-    {
-      "round": 2,
-      "challenge": 329621580,
-      "query_index": 0,
-      "left_opening": {
-        "index": 0,
-        "value": 466794824,
-        "siblings": [
-          "366cff4068d5388705b278497043660b2758a0c1a98ac8d0c39e4331e1ba0408"
-        ]
-      },
-      "right_opening": {
-        "index": 1,
-        "value": 446109864,
-        "siblings": [
-          "02dd030ae627118e1dfa07e35dfc77745fcd25c32e0976be00f67731bbfb4556"
-        ]
-      },
-      "next_opening": {
-        "index": 0,
-        "value": 847462977,
-        "siblings": []
-      }
-    }
-  ],
-  "witness_index": 5,
-  "witness_point": [
-    1,
-    0,
-    1
-  ],
-  "witness_opening": {
-    "index": 5,
-    "value": 0,
-    "siblings": [
-      "a5df96fa32b87fcfcca5338891e20929ceffb2cf7787ca8863953fc23fbfeec2",
-      "a01f019fa8df420b6a1895802bfe7f29463bd6832eecd5083189f08ebc6de787",
-      "14512230aae2af4110f190a27207945803846b8be1460675de231032253bf51d"
-    ]
+    "claimed_p_at_witness": 0
   },
-  "claimed_value_at_witness": 0,
-  "claimed_p_at_witness": 0
+  "stats": {
+    "build_ms": 5,
+    "grid_bits": 3,
+    "grid_size": 8,
+    "fold_rounds": 3,
+    "field_ops_estimate": 200
+  }
 }
