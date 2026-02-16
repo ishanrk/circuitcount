@@ -405,8 +405,13 @@ fn run_verify(cnf_path: &str, witness_path: &str, proof_path: &str) -> Result<bo
         let root_i = &proof.round_roots[round];
         let root_next = &proof.round_roots[round + 1];
         let expected_challenge = fs_challenge(proof.seed, round, root_i);
-        let expected_query =
-            fs_query(proof.seed, round, root_i, root_next, 1usize << (proof.grid_bits - round - 1));
+        let expected_query = fs_query(
+            proof.seed,
+            round,
+            root_i,
+            root_next,
+            1usize << (proof.grid_bits - round - 1),
+        );
 
         if round_proof.challenge != expected_challenge.as_u64() {
             return Ok(false);
@@ -473,7 +478,8 @@ fn run_demo() -> Result<()> {
 }
 
 fn load_cnf(path: &str) -> Result<Cnf> {
-    let content = fs::read_to_string(path).with_context(|| format!("cannot read CNF file {path}"))?;
+    let content =
+        fs::read_to_string(path).with_context(|| format!("cannot read CNF file {path}"))?;
     Cnf::parse_dimacs(&content)
 }
 
@@ -512,7 +518,12 @@ fn clause_unsat_indicator(clause: &[i32], point: &[u8]) -> Result<Fp> {
     Ok(acc)
 }
 
-fn aggregate_poly_eval(cnf: &Cnf, point: &[u8], clause_weights: &[Fp], boolean_weights: &[Fp]) -> Fp {
+fn aggregate_poly_eval(
+    cnf: &Cnf,
+    point: &[u8],
+    clause_weights: &[Fp],
+    boolean_weights: &[Fp],
+) -> Fp {
     let mut acc = Fp::zero();
     for (j, clause) in cnf.clauses.iter().enumerate() {
         let u = clause_unsat_indicator(clause, point).unwrap_or(Fp::one());
@@ -592,12 +603,21 @@ fn merkle_levels(values: &[Fp]) -> Vec<Vec<[u8; 32]>> {
 
 fn merkle_root_hex(values: &[Fp]) -> String {
     let levels = merkle_levels(values);
-    to_hex(levels.last().and_then(|v| v.first()).copied().unwrap_or([0u8; 32]))
+    to_hex(
+        levels
+            .last()
+            .and_then(|v| v.first())
+            .copied()
+            .unwrap_or([0u8; 32]),
+    )
 }
 
 fn merkle_open(values: &[Fp], mut index: usize) -> Result<MerkleOpening> {
     if index >= values.len() {
-        bail!("opening index {index} out of bounds for {} leaves", values.len());
+        bail!(
+            "opening index {index} out of bounds for {} leaves",
+            values.len()
+        );
     }
     let original_index = index;
     let original_value = values[index].as_u64();
@@ -723,7 +743,11 @@ struct XorShift64 {
 impl XorShift64 {
     fn new(seed: u64) -> Self {
         Self {
-            state: if seed == 0 { 0x9E37_79B9_7F4A_7C15 } else { seed },
+            state: if seed == 0 {
+                0x9E37_79B9_7F4A_7C15
+            } else {
+                seed
+            },
         }
     }
 
