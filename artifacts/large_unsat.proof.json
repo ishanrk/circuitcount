@@ -1124,7 +1124,7 @@
     "claimed_p_at_witness": 777649507
   },
   "stats": {
-    "build_ms": 76,
+    "build_ms": 82,
     "grid_bits": 9,
     "grid_size": 512,
     "fold_rounds": 9,

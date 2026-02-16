@@ -13,7 +13,13 @@ pub struct MerkleOpening {
 
 pub fn merkle_root_hex(values: &[Fp]) -> String {
     let levels = merkle_levels(values);
-    to_hex(levels.last().and_then(|x| x.first()).copied().unwrap_or([0u8; 32]))
+    to_hex(
+        levels
+            .last()
+            .and_then(|x| x.first())
+            .copied()
+            .unwrap_or([0u8; 32]),
+    )
 }
 
 pub fn merkle_open(values: &[Fp], mut index: usize) -> Result<MerkleOpening> {

@@ -100,16 +100,17 @@ pub fn prove(cnf: &Cnf, witness: &[u8], cfg: &ProverConfig) -> Result<ProveOutpu
     let grid_size = 1usize << grid_bits;
 
     let mut grid_values = vec![Fp::zero(); grid_size];
-    grid_values.par_iter_mut().enumerate().try_for_each(
-        |(idx, slot)| -> Result<()> {
+    grid_values
+        .par_iter_mut()
+        .enumerate()
+        .try_for_each(|(idx, slot)| -> Result<()> {
             let mut point = witness.to_vec();
             for (bit, coord) in point.iter_mut().take(grid_bits).enumerate() {
                 *coord = ((idx >> bit) & 1) as u8;
             }
             *slot = cnf.aggregate_poly_eval(&point, &clause_weights_fp, &boolean_weights_fp)?;
             Ok(())
-        },
-    )?;
+        })?;
 
     let mut vectors = vec![grid_values];
     for round in 0..grid_bits {
@@ -118,7 +119,10 @@ pub fn prove(cnf: &Cnf, witness: &[u8], cfg: &ProverConfig) -> Result<ProveOutpu
         vectors.push(fold_vector(&vectors[round], challenge));
     }
 
-    let round_roots = vectors.iter().map(|v| merkle_root_hex(v)).collect::<Vec<_>>();
+    let round_roots = vectors
+        .iter()
+        .map(|v| merkle_root_hex(v))
+        .collect::<Vec<_>>();
     let mut rounds = Vec::<RoundProof>::with_capacity(grid_bits);
     for round in 0..grid_bits {
         let root_i = &round_roots[round];
@@ -135,7 +139,10 @@ pub fn prove(cnf: &Cnf, witness: &[u8], cfg: &ProverConfig) -> Result<ProveOutpu
         let folded = Fp::new(left_opening.value) * (Fp::one() - challenge)
             + Fp::new(right_opening.value) * challenge;
         if folded.as_u64() != next_opening.value {
-            bail!("internal prover consistency check failed at round {}", round);
+            bail!(
+                "internal prover consistency check failed at round {}",
+                round
+            );
         }
         rounds.push(RoundProof {
             round,
@@ -168,9 +175,8 @@ pub fn prove(cnf: &Cnf, witness: &[u8], cfg: &ProverConfig) -> Result<ProveOutpu
     };
 
     let degree = cnf.aggregate_degree_upper_bound();
-    let field_ops_estimate = grid_size * (cnf.clauses.len() * degree + cnf.num_vars * 4)
-        + grid_size
-        + (grid_bits * 16);
+    let field_ops_estimate =
+        grid_size * (cnf.clauses.len() * degree + cnf.num_vars * 4) + grid_size + (grid_bits * 16);
     let stats = ProofStats {
         build_ms: started.elapsed().as_millis(),
         grid_bits,

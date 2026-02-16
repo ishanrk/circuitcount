@@ -179,7 +179,8 @@ pub fn bits_to_index(bits: &[u8]) -> usize {
 }
 
 pub fn load_cnf(path: &str) -> Result<Cnf> {
-    let content = fs::read_to_string(path).with_context(|| format!("cannot read CNF file {path}"))?;
+    let content =
+        fs::read_to_string(path).with_context(|| format!("cannot read CNF file {path}"))?;
     Cnf::parse_dimacs(&content)
 }
 
@@ -195,7 +196,11 @@ pub fn load_witness(path: &str, num_vars: usize) -> Result<Vec<u8>> {
         }
     }
     if bits.len() != num_vars {
-        bail!("witness has {} bits but CNF requires {}", bits.len(), num_vars);
+        bail!(
+            "witness has {} bits but CNF requires {}",
+            bits.len(),
+            num_vars
+        );
     }
     Ok(bits)
 }

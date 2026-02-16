@@ -1,74 +1,72 @@
 # FFTSAT
 
-FFTSAT is a finite-field proof-carrying SAT prototype written in Rust. The project encodes a CNF instance into polynomial constraints over a prime field, combines those constraints into a single aggregate identity with random linear combinations, commits to evaluation tables with a Merkle tree, and emits a sumcheck-style folding transcript that a verifier can replay. The verifier accepts when the witness is consistent with the committed transcript and the aggregate identity evaluates to zero at the witness point.
+FFTSAT is a finite-field proof-carrying SAT implementation in Rust. Given a CNF formula and witness, the prover maps constraints into polynomial identities over `Fp` with `p = 998244353`, commits to a subspace evaluation table with a Merkle tree, and emits a Fiat-Shamir transcript of fold rounds. The verifier checks Merkle openings, fold equations, and the terminal condition `P(w) = 0`.
 
-This repository is an executable reference implementation focused on end-to-end reproducibility. It includes DIMACS parsing, witness loading, finite-field arithmetic over `Fp` with a fixed prime modulus, clause-to-polynomial mapping, booleanity constraints, Fiat-Shamir challenges, Merkle authentication paths for transcript openings, and a command line interface that runs both positive and negative demonstrations.
+## Algebraic Formulation
 
-## Algebraic Encoding
+For variable vector `x in {0,1}^n` and clause `C_j = (l_{j,1} OR ... OR l_{j,k_j})`, define the unsatisfied-indicator polynomial
 
-Given a clause `C = (l1 OR l2 OR ... OR lk)`, FFTSAT uses the unsatisfied-indicator polynomial
+`U_j(x) = product_t (1 - E(l_{j,t}, x))`,
 
-`U_C(x) = product_i (1 - eval(li, x))`
+where `E(x_i, x) = x_i` and `E(not x_i, x) = 1 - x_i`. On Boolean points, `U_j(x) = 1` iff clause `j` is unsatisfied, otherwise `0`. Enforce Booleanity with `B_i(x) = x_i(x_i - 1)`. Sample random coefficients `r_j, s_i in Fp` and define
 
-where `eval(li, x)` maps a positive literal `xi` to `xi` and a negated literal `NOT xi` to `1 - xi`. For Boolean assignments, `U_C(x)` is zero when the clause is satisfied and one when the clause is falsified. Booleanity is enforced with `B_i(x) = xi(xi - 1)`.
+`P(x) = sum_j r_j U_j(x) + sum_i s_i B_i(x)`.
 
-The aggregate polynomial is
+If the witness satisfies all clauses and is Boolean, `P(w) = 0`. For a non-zero polynomial `Q` of degree `d`, Schwartz-Zippel bounds random zero-test failure by `d / |Fp|`, so the prototype reports `d / p` as its explicit soundness upper bound.
 
-`P(x) = sum_j r_j U_{C_j}(x) + sum_i s_i B_i(x)`
+## Protocol Sketch
 
-with random coefficients sampled from `Fp`. If the witness satisfies every clause and each coordinate is Boolean, then `P(w) = 0`. The random combination gives the standard Schwartz-Zippel style soundness intuition: a false identity is unlikely to vanish on random checks over a sufficiently large field.
+The prover fixes `k` coordinates as a Boolean hypercube and evaluates `P` on `2^k` points. Let this vector be `v_0`. It commits to `v_0` via a Merkle root. For rounds `r = 0..k-1`, it derives challenge `alpha_r` with Fiat-Shamir, folds pairs as
 
-## Proof Object
+`v_{r+1}[i] = (1 - alpha_r) v_r[2i] + alpha_r v_r[2i+1]`,
 
-The prover commits to evaluations of `P` on a small subspace grid formed by varying the first `k` witness coordinates and fixing the rest. It then generates `k` folding rounds. Each round computes a random challenge, folds adjacent values linearly, commits to the next vector root, and provides Merkle openings for one query location chosen from Fiat-Shamir data. The final proof is serialized as JSON and contains field parameters, random coefficients, commitment roots, authenticated openings, the witness index on the grid, and claimed witness evaluations.
+commits to `v_{r+1}`, and records Merkle openings at one FS-derived query index. The verifier re-derives challenges/queries, checks all openings and fold equations, checks witness inclusion against the first root, recomputes `P(w)`, and accepts iff all checks hold and `P(w) = 0`.
 
-The verifier recomputes challenges and queries, checks Merkle paths, verifies fold consistency equations for every round, recomputes `P(w)`, and accepts only when all transcript checks pass and `P(w) = 0`.
+## Codebase Structure
 
-## Complete Demo
+`src/field.rs` implements finite-field arithmetic (`Fp`, inversion, roots of unity). `src/ntt.rs` provides naive and NTT polynomial multiplication for consistency and performance testing. `src/cnf.rs` implements robust DIMACS parsing, witness IO, clause evaluation, aggregate polynomial evaluation, and planted 3-SAT generation. `src/merkle.rs` provides Merkle commitments and authentication path verification. `src/protocol.rs` implements proving, verification, transcript serialization, fold checks, and soundness-bound utilities. `src/main.rs` is the CLI entrypoint with operational commands.
 
-Clone the repository and run the integrated demonstration command:
+## CLI Surface
+
+`prove` builds a proof JSON with transcript and stats. `verify` validates one proof. `batch-verify` validates a manifest of proof instances. `profile` computes structural metrics (`max_clause_width`, degree bound, Schwartz-Zippel bound). `gen-random` generates large planted SAT or forced-UNSAT instances. `poly-mul-demo` compares naive convolution and NTT. `demo` runs small and large end-to-end accept/reject paths.
+
+## Reproducible Runs
+
+Run full demo:
 
 ```bash
 cargo run -- demo
 ```
 
-The expected behavior is that the satisfiable instance is accepted and the unsatisfiable instance is rejected. A successful run prints output similar to:
-
-```text
-Running SAT demo with a valid witness.
-Proof generated at artifacts/sat.proof.json with grid bits 3 and root ...
-SAT instance verification result: ACCEPT
-Running UNSAT demo using an invalid witness to show rejection.
-Proof generated at artifacts/unsat.proof.json with grid bits 1 and root ...
-UNSAT instance verification result: REJECT
-```
-
-After this command, `artifacts/sat.proof.json` and `artifacts/unsat.proof.json` are created so you can inspect the transcript and Merkle openings directly.
-
-## Manual End-to-End Run
-
-You can generate and verify a satisfiable proof directly with:
+Generate and verify a large SAT instance:
 
 ```bash
-cargo run -- prove --cnf examples/sat.cnf --witness examples/sat.wtns --proof artifacts/sat.proof.json --seed 7 --grid-bits 3
-cargo run -- verify --cnf examples/sat.cnf --witness examples/sat.wtns --proof artifacts/sat.proof.json
+cargo run -- gen-random --vars 64 --clauses 320 --seed 1337 --cnf-out examples/large_sat.cnf --witness-out examples/large_sat.wtns
+cargo run -- prove --cnf examples/large_sat.cnf --witness examples/large_sat.wtns --proof artifacts/large_sat.proof.json --seed 19 --grid-bits 10
+cargo run -- verify --cnf examples/large_sat.cnf --witness examples/large_sat.wtns --proof artifacts/large_sat.proof.json
 ```
 
-The verify command should print `VERIFICATION: ACCEPT`.
-
-To demonstrate rejection on an invalid witness for an unsatisfiable instance, run:
+Generate and verify a large UNSAT stress case (forced contradiction):
 
 ```bash
-cargo run -- prove --cnf examples/unsat.cnf --witness examples/unsat.wtns --proof artifacts/unsat.proof.json --seed 11 --grid-bits 1 --allow-invalid
-cargo run -- verify --cnf examples/unsat.cnf --witness examples/unsat.wtns --proof artifacts/unsat.proof.json
+cargo run -- gen-random --vars 96 --clauses 640 --seed 2026 --cnf-out examples/large_unsat.cnf --witness-out examples/large_unsat.wtns --make-unsat
+cargo run -- prove --cnf examples/large_unsat.cnf --witness examples/large_unsat.wtns --proof artifacts/large_unsat.proof.json --seed 23 --grid-bits 9 --allow-invalid
+cargo run -- verify --cnf examples/large_unsat.cnf --witness examples/large_unsat.wtns --proof artifacts/large_unsat.proof.json
 ```
 
-The verify command should print `VERIFICATION: REJECT`.
+Run complexity and arithmetic diagnostics:
 
-## Repository Layout
+```bash
+cargo run -- profile --cnf examples/large_sat.cnf
+cargo run -- poly-mul-demo --degree 256 --seed 314159
+cargo run -- batch-verify --manifest examples/batch_manifest.json
+```
 
-The `src/main.rs` file contains the full CLI, finite-field arithmetic, DIMACS parser, polynomial encoding, Merkle commitment logic, transcript generation, and verifier checks. The `examples` directory contains one satisfiable and one unsatisfiable DIMACS benchmark plus matching witness files used by the demo command. The `artifacts` directory is generated at runtime and stores proof JSON files.
+## References
 
-## Notes
-
-This codebase is intentionally compact so the full proving and verification path is easy to audit and run locally. The implementation currently prioritizes correctness and transparency over high-performance kernels. It is straightforward to extend with Montgomery multiplication, SIMD batched operations, NTT-based polynomial arithmetic, and multicore interpolation once the protocol surface is fixed.
+[1] J. T. Schwartz, *Fast Probabilistic Algorithms for Verification of Polynomial Identities*, J. ACM, 1980.  
+[2] R. Zippel, *Probabilistic Algorithms for Sparse Polynomials*, EUROSAM, 1979.  
+[3] C. Lund, L. Fortnow, H. Karloff, N. Nisan, *Algebraic Methods for Interactive Proof Systems*, J. ACM, 1992.  
+[4] R. C. Merkle, *A Digital Signature Based on a Conventional Encryption Function*, CRYPTO, 1987.  
+[5] A. Fiat, A. Shamir, *How to Prove Yourself: Practical Solutions to Identification and Signature Problems*, CRYPTO, 1986.  
+[6] J. W. Cooley, J. W. Tukey, *An Algorithm for the Machine Calculation of Complex Fourier Series*, Math. Comp., 1965.

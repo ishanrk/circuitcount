@@ -825,7 +825,7 @@
     "claimed_p_at_witness": 0
   },
   "stats": {
-    "build_ms": 152,
+    "build_ms": 150,
     "grid_bits": 10,
     "grid_size": 1024,
     "fold_rounds": 10,

@@ -2,9 +2,7 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use serde::{Deserialize, Serialize};
 
-use ffsat::cnf::{
-    generate_planted_3sat, load_cnf, load_witness, write_cnf, write_witness,
-};
+use ffsat::cnf::{generate_planted_3sat, load_cnf, load_witness, write_cnf, write_witness};
 use ffsat::field::Fp;
 use ffsat::ntt::{naive_mul, ntt_mul};
 use ffsat::protocol::{
@@ -290,6 +288,10 @@ fn prove_and_verify(
     let outcome = if report.accepted { "ACCEPT" } else { "REJECT" };
     Ok(format!(
         "{} root={} grid={}ms={} reason={}",
-        outcome, output.proof.grid_root, output.stats.grid_bits, output.stats.build_ms, report.reason
+        outcome,
+        output.proof.grid_root,
+        output.stats.grid_bits,
+        output.stats.build_ms,
+        report.reason
     ))
 }
