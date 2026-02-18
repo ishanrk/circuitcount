@@ -69,7 +69,7 @@ The merged benchmark has 30 instances. The median wall time is 0 ms. The p90 wal
 
 ## Figures
 
-`wall_ms` is end-to-end wall clock time in milliseconds for one benchmark row. `solve_calls` is the number of SAT solves used by the counting loop for that row. `time_per_call_ms` is `wall_ms / max(solve_calls, 1)`. `clause_density` is `cnf_clauses / max(cnf_vars, 1)`. `diversity_score` is `cone_frac * ands_per_cone_in`, where `cone_frac = cone_inputs / max(aig_inputs, 1)` and `ands_per_cone_in = aig_ands / max(cone_inputs, 1)`.
+`wall_ms` is end-to-end wall clock time in milliseconds for one benchmark row. `solve_calls` is the number of SAT solves used by the counting loop for that row. `time_per_call_ms` is `wall_ms / max(solve_calls, 1)`. `clause_density` is `cnf_clauses / max(cnf_vars, 1)`. `diversity_score` is `cone_frac * ands_per_cone_in`, where `cone_frac = cone_inputs / max(aig_inputs, 1)` and `ands_per_cone_in = aig_ands / max(cone_inputs, 1)`. p90 is the 90th percentile: the value such that 90% of the data is at or below it.
 
 The figures are generated from `results/results.csv`. The script also writes `docs/fig/report.md` with numeric summaries used in this section.
 
@@ -81,21 +81,18 @@ This figure shows wall time by CNF size bucket. It highlights how latency change
 
 ![time histogram](docs/fig/time_hist.png)
 
-This figure shows solve call distribution by the same size buckets. It separates loop intensity from per-call latency.
+This figure shows solve call distribution by the same size buckets. 
 
 ![solve calls histogram](docs/fig/solve_calls_hist.png)
 
-This figure shows model count time per solve against vars per clause with diversity-aware coloring. It is the vars-per-clause and diversity view.
+This figure shows model count time per solve against vars per clause. 
 
 ![time vs cnf clauses](docs/fig/time_vs_cnf.png)
 
-This figure shows model count time by circuit characteristics. Family is inferred from dominant gate type in BENCH expressions.
-
-![family summary](docs/fig/family_summary.png)
 
 The current report values are dataset_rows=1440, ok_rows=1398, timeout_rows=0, median_wall_ms_ok=1.000, and p90_wall_ms_ok=1.300. The largest size bucket is (8.0, 17.0], with largest_bucket_median_wall_ms_ok=1.000 and largest_bucket_timeout_rate=0.000.
 
-Interpretation from this run is that lag appears in the largest CNF bucket by wall time. Timeout concentration is not present in this sample. The vars-per-clause to time-per-call correlation is positive at 0.041. The family summary shows comparable medians across dominant gate families, with separation appearing mostly in higher percentiles.
+Interpretation from this run is that lag appears in the largest CNF bucket by wall time. Timeout concentration is not present in this sample. The vars-per-clause to time-per-call correlation is positive at 0.041.
 
 ## References
 
