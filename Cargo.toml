@@ -1,12 +1,18 @@
 [package]
-name = "ffsat"
+name = "circuitcount"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
 anyhow = "1"
+thiserror = "2"
 clap = { version = "4", features = ["derive"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-sha2 = "0.10"
-rayon = "1"
+indexmap = "2"
+
+[dev-dependencies]
+proptest = "1"
+
+[lints.clippy]
+dbg_macro = "deny"
+todo = "deny"
+unwrap_used = "deny"
