@@ -69,23 +69,37 @@ The merged benchmark has 30 instances. The median wall time is 0 ms. The p90 wal
 
 ## Figures
 
-`wall_ms` is end-to-end wall clock time in milliseconds for one benchmark row. `solve_calls` is the number of SAT solves used by the counting loop for that row. `time_per_call_ms` is `wall_ms / max(solve_calls, 1)`. `clause_density` is `cnf_clauses / max(cnf_vars, 1)`. `diversity_score` is `cone_frac * ands_per_cone_in`, where `cone_frac = cone_inputs / max(aig_inputs, 1)` and `ands_per_cone_in = aig_ands / max(cone_inputs, 1)`. p90 is the 90th percentile: the value such that 90% of the data is at or below it.
+Definitions of terms used in the figures and report:
 
-The figures are generated from `results/results.csv`. The script also writes `docs/fig/report.md` with numeric summaries used in this section.
+**wall_ms.** End-to-end wall clock time in milliseconds for one benchmark run (one circuit, one output index). It is the total time from start of the counting pipeline to finish, including parse, simplify, encode, and all SAT solver invocations.
+
+**solve_calls.** The number of times the counting code calls the SAT solver for that run. The counter enumerates distinct projected solutions by repeatedly solving the CNF, recording the projected assignment, adding a blocking clause that forbids that assignment, and solving again until the formula becomes unsatisfiable or a cap is hit. Each such solve is one "solve call." So solve_calls is the total number of SAT queries issued for that instance.
+
+**CNF size bucket.** The Tseitin encoding turns the simplified AIG into a CNF with some number of variables (`cnf_vars`) and clauses (`cnf_clauses`). A "CNF size bucket" is a range of `cnf_clauses` values used to group instances. The plotting script splits the range of `cnf_clauses` in the dataset into a small number of intervals (e.g. by quantiles) and assigns each row to one bucket. All figures that say "by CNF size bucket" group instances by these intervals so you can see how wall time or solve calls behave as formula size (in clauses) increases.
+
+**time_per_call_ms.** Average milliseconds per SAT call for that run: `wall_ms / max(solve_calls, 1)`. It separates "how many solves" from "how expensive each solve is."
+
+**vars_per_clause.** Ratio `cnf_vars / max(cnf_clauses, 1)`. It characterizes formula shape (variables per clause). Used in one figure to see how this ratio relates to time per call.
+
+**Family.** For BENCH circuits, "family" is inferred from the dominant gate type in the file (e.g. mostly AND, mostly XOR, mostly OR). The script counts AND, OR, XOR, XNOR, NOT, BUF in the bench text and labels the instance by the most frequent op. The family summary figure then groups by this label so you can compare model count time across circuit types.
+
+**p90.** The 90th percentile: the value such that 90% of the data is at or below it. For example p90 wall_ms means 90% of runs had wall time at or below that many milliseconds.
+
+The figures are generated from `results/results.csv`. The script also writes `docs/fig/report.md` with numeric summaries.
 
 ```bash
 python scripts/plot_results.py --csv results/results.csv --out_dir docs/fig
 ```
 
-This figure shows wall time by CNF size bucket. It highlights how latency changes with formula size and reports median and p90 directly in the title.
+This figure shows **wall_ms** (total run time) grouped by **CNF size bucket** (ranges of `cnf_clauses`). Each bar corresponds to one bucket; the plot highlights how latency changes with formula size and reports median and p90 in the title.
 
 ![time histogram](docs/fig/time_hist.png)
 
-This figure shows solve call distribution by the same size buckets. 
+This figure shows **solve_calls** (number of SAT solver invocations per run) grouped by the same **CNF size buckets** as above. More solutions enumerated before UNSAT or cap means more solve calls. 
 
 ![solve calls histogram](docs/fig/solve_calls_hist.png)
 
-This figure shows model count time per solve against vars per clause. 
+This figure plots **time_per_call_ms** (average ms per SAT call) against **vars_per_clause** and/or structure (e.g. diversity). It shows how expensive each solve is as a function of formula shape. 
 
 ![time vs cnf clauses](docs/fig/time_vs_cnf.png)
 
