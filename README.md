@@ -85,21 +85,17 @@ This figure shows solve call distribution by the same size buckets. It separates
 
 ![solve calls histogram](docs/fig/solve_calls_hist.png)
 
-This figure shows model count time versus CNF size with family coloring. It shows where larger formulas start to lag.
+This figure shows model count time per solve against vars per clause with diversity-aware coloring. It is the vars-per-clause and diversity view.
 
 ![time vs cnf clauses](docs/fig/time_vs_cnf.png)
 
-This figure shows model count time by circuit characteristics. It reports median and p90 by inferred family for families with enough rows.
+This figure shows model count time by circuit characteristics. Family is inferred from dominant gate type in BENCH expressions.
 
 ![family summary](docs/fig/family_summary.png)
 
-This figure shows performance regime by vars-per-clauses and diversity. Each cell is a median `time_per_call_ms` over a density and diversity bucket.
+The current report values are dataset_rows=1440, ok_rows=1398, timeout_rows=0, median_wall_ms_ok=1.000, and p90_wall_ms_ok=1.300. The largest size bucket is (8.0, 17.0], with largest_bucket_median_wall_ms_ok=1.000 and largest_bucket_timeout_rate=0.000.
 
-![regime heatmap](docs/fig/regime_heatmap.png)
-
-The current report values are dataset_rows=30, ok_rows=28, timeout_rows=0, median_wall_ms_ok=0.500, and p90_wall_ms_ok=1.000. The largest size bucket is (6.5, 11.0], with largest_bucket_median_wall_ms_ok=1.000 and largest_bucket_timeout_rate=0.000.
-
-Interpretation from this run is that lag appears in the largest CNF bucket by wall time. Timeout concentration is not present in this sample. Per-solve cost rises in higher density and higher diversity regions. The family summary shows lower median wall time for `aag` than `bench` in this dataset.
+Interpretation from this run is that lag appears in the largest CNF bucket by wall time. Timeout concentration is not present in this sample. The vars-per-clause to time-per-call correlation is positive at 0.041. The family summary shows comparable medians across dominant gate families, with separation appearing mostly in higher percentiles.
 
 ## References
 
