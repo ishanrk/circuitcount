@@ -69,49 +69,37 @@ The merged benchmark has 30 instances. The median wall time is 0 ms. The p90 wal
 
 ## Figures
 
-The figures are generated from `results/results.csv` and `docs/fig/report.md`.
+`wall_ms` is end-to-end wall clock time in milliseconds for one benchmark row. `solve_calls` is the number of SAT solves used by the counting loop for that row. `time_per_call_ms` is `wall_ms / max(solve_calls, 1)`. `clause_density` is `cnf_clauses / max(cnf_vars, 1)`. `diversity_score` is `cone_frac * ands_per_cone_in`, where `cone_frac = cone_inputs / max(aig_inputs, 1)` and `ands_per_cone_in = aig_ands / max(cone_inputs, 1)`.
+
+The figures are generated from `results/results.csv`. The script also writes `docs/fig/report.md` with numeric summaries used in this section.
 
 ```bash
 python scripts/plot_results.py --csv results/results.csv --out_dir docs/fig
 ```
 
-`docs/fig/time_hist.png` shows wall time by CNF size bucket. This plot answers where lag appears by size regime and reports median and p90 in the title.
+This figure shows wall time by CNF size bucket. It highlights how latency changes with formula size and reports median and p90 directly in the title.
 
 ![time histogram](docs/fig/time_hist.png)
 
-`docs/fig/solve_calls_hist.png` shows solve call distribution by the same size buckets. This plot separates oracle intensity from per-call cost.
+This figure shows solve call distribution by the same size buckets. It separates loop intensity from per-call latency.
 
 ![solve calls histogram](docs/fig/solve_calls_hist.png)
 
-`docs/fig/time_vs_cnf.png` shows wall time versus CNF clauses with mode coloring and a binned median trend line.
+This figure shows model count time versus CNF size with family coloring. It shows where larger formulas start to lag.
 
 ![time vs cnf clauses](docs/fig/time_vs_cnf.png)
 
-`docs/fig/time_per_call_vs_density.png` shows per-call latency against clause density to highlight expensive solve regions.
-
-![time per call vs density](docs/fig/time_per_call_vs_density.png)
-
-`docs/fig/timeout_rate_by_size.png` shows status fractions by size bucket for failure concentration analysis.
-
-![timeout rate by size](docs/fig/timeout_rate_by_size.png)
-
-`docs/fig/top_slowest.png` shows the slowest instances with family and CNF size labels.
-
-![top slowest instances](docs/fig/top_slowest.png)
-
-`docs/fig/family_summary.png` shows median and p90 wall time by inferred family for families with at least five rows.
+This figure shows model count time by circuit characteristics. It reports median and p90 by inferred family for families with enough rows.
 
 ![family summary](docs/fig/family_summary.png)
 
-`docs/fig/regime_heatmap.png` shows median wall time over a 2D regime grid of CNF size and clause density.
+This figure shows performance regime by vars-per-clauses and diversity. Each cell is a median `time_per_call_ms` over a density and diversity bucket.
 
 ![regime heatmap](docs/fig/regime_heatmap.png)
 
-The report values are dataset_rows=30, ok_rows=28, timeout_rows=0, median_wall_ms_ok=0.500, and p90_wall_ms_ok=1.000. The largest size bucket is (6.5, 11.0], with largest_bucket_median_wall_ms_ok=1.000 and largest_bucket_timeout_rate=0.000.
+The current report values are dataset_rows=30, ok_rows=28, timeout_rows=0, median_wall_ms_ok=0.500, and p90_wall_ms_ok=1.000. The largest size bucket is (6.5, 11.0], with largest_bucket_median_wall_ms_ok=1.000 and largest_bucket_timeout_rate=0.000.
 
-Interpretation from the report and figures is that lag concentrates in the largest CNF bucket by wall time, timeout concentration is not present in this sample, time_per_call grows with clause_density in the upper-density region, and the aag family has lower median wall time than the bench family on this run.
-
-The required figure paths are `docs/fig/time_hist.png`, `docs/fig/solve_calls_hist.png`, and `docs/fig/time_vs_cnf.png`.
+Interpretation from this run is that lag appears in the largest CNF bucket by wall time. Timeout concentration is not present in this sample. Per-solve cost rises in higher density and higher diversity regions. The family summary shows lower median wall time for `aag` than `bench` in this dataset.
 
 ## References
 

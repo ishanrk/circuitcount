@@ -69,6 +69,8 @@ def add_metrics(df: pd.DataFrame, root_hint: Path) -> pd.DataFrame:
     out["cone_frac"] = out["cone_inputs"] / out["aig_inputs"].clip(lower=1)
     out["ands_per_cone_in"] = out["aig_ands"] / out["cone_inputs"].clip(lower=1)
     out["throughput_clauses_per_ms"] = out["cnf_clauses"] / out["wall_ms"].clip(lower=1)
+    # simple structural diversity signal from cone pressure
+    out["diversity_score"] = out["cone_frac"] * out["ands_per_cone_in"]
     out["log_wall_ms"] = np.log10(out["wall_ms"].clip(lower=1))
     out["log_cnf_clauses"] = np.log10(out["cnf_clauses"].clip(lower=1))
     return out
@@ -135,67 +137,21 @@ def plot_time_vs_cnf(ok_df: pd.DataFrame, out_path: Path):
     plt.close()
 
 
-def plot_time_per_call_vs_density(ok_df: pd.DataFrame, out_path: Path):
+def plot_time_vs_cnf_size(ok_df: pd.DataFrame, out_path: Path):
     plt.figure(figsize=(8.5, 5))
     for key, group in ok_df.groupby("family"):
         plt.scatter(
-            group["clause_density"],
-            group["time_per_call_ms"],
+            group["cnf_clauses"],
+            group["wall_ms"],
             s=25,
-            alpha=0.8,
+            alpha=0.75,
             label=str(key),
         )
-    plt.title("time_per_call_ms vs clause_density")
-    plt.xlabel("clause_density")
-    plt.ylabel("time_per_call_ms")
+    plt.title("model count time vs cnf size")
+    plt.xlabel("cnf_clauses")
+    plt.ylabel("wall_ms")
     if len(ok_df["family"].unique()) <= 12:
         plt.legend()
-    plt.tight_layout()
-    plt.savefig(out_path)
-    plt.close()
-
-
-def plot_timeout_rate_by_size(df: pd.DataFrame, out_path: Path):
-    table = (
-        df.groupby(["size_bucket_all", "status"]).size().unstack(fill_value=0).sort_index()
-    )
-    frac = table.div(table.sum(axis=1).replace(0, 1), axis=0)
-    plt.figure(figsize=(10, 4.5))
-    x = np.arange(len(frac.index))
-    bottom = np.zeros(len(frac.index))
-    for col in frac.columns:
-        vals = frac[col].values
-        plt.bar(x, vals, bottom=bottom, label=col)
-        bottom += vals
-    plt.title("status fraction by cnf size bucket")
-    plt.xlabel("cnf size bucket")
-    plt.ylabel("fraction")
-    plt.xticks(x, [str(i) for i in frac.index], rotation=20, ha="right")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(out_path)
-    plt.close()
-
-
-def plot_top_slowest(ok_df: pd.DataFrame, out_path: Path):
-    top = ok_df.sort_values("wall_ms", ascending=False).head(20).copy()
-    if top.empty:
-        plt.figure(figsize=(8, 4))
-        plt.title("top 20 slowest instances")
-        plt.tight_layout()
-        plt.savefig(out_path)
-        plt.close()
-        return
-    top["label"] = top["family"].astype(str) + "/" + top["path"].map(
-        lambda p: Path(str(p).replace("\\", "/")).stem
-    ) + " c=" + top["cnf_clauses"].fillna(0).astype(int).astype(str)
-    plt.figure(figsize=(11, 6.5))
-    y = np.arange(len(top))
-    plt.barh(y, top["wall_ms"].values)
-    plt.yticks(y, top["label"].values)
-    plt.gca().invert_yaxis()
-    plt.title("top 20 slowest instances by wall_ms")
-    plt.xlabel("wall_ms")
     plt.tight_layout()
     plt.savefig(out_path)
     plt.close()
@@ -213,46 +169,46 @@ def plot_family_summary(ok_df: pd.DataFrame, out_path: Path, min_n: int = 5):
         plt.savefig(out_path)
         plt.close()
         return
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(10, 5.5))
     x = np.arange(len(agg))
-    plt.plot(x, agg["median"], marker="o", label="median")
-    plt.plot(x, agg["p90"], marker="o", label="p90")
+    plt.plot(x, agg["median"], marker="o", label="median wall_ms")
+    plt.plot(x, agg["p90"], marker="o", label="p90 wall_ms")
+    plt.plot(x, agg["count"], marker="o", label="count")
     plt.xticks(x, agg["family"], rotation=20, ha="right")
-    plt.title("family wall_ms summary (count >= 5)")
-    plt.ylabel("wall_ms")
-    plt.legend()
+    plt.title("model count time by circuit family")
+    plt.ylabel("value")
     plt.tight_layout()
     plt.savefig(out_path)
     plt.close()
 
 
-def plot_regime_heatmap(ok_df: pd.DataFrame, out_path: Path):
-    d = ok_df.dropna(subset=["cnf_clauses", "clause_density", "wall_ms"]).copy()
+def plot_regime_density_diversity(ok_df: pd.DataFrame, out_path: Path):
+    d = ok_df.dropna(subset=["clause_density", "time_per_call_ms", "diversity_score"]).copy()
     if d.empty:
         plt.figure(figsize=(8, 4))
-        plt.title("median wall_ms by cnf size and density")
+        plt.title("time per solve by density and diversity")
         plt.tight_layout()
         plt.savefig(out_path)
         plt.close()
         return
-    x_bins = np.unique(np.quantile(d["cnf_clauses"], np.linspace(0.0, 1.0, 6)))
-    y_bins = np.unique(np.quantile(d["clause_density"], np.linspace(0.0, 1.0, 6)))
+    x_bins = np.unique(np.quantile(d["clause_density"], np.linspace(0.0, 1.0, 6)))
+    y_bins = np.unique(np.quantile(d["diversity_score"], np.linspace(0.0, 1.0, 6)))
     if len(x_bins) < 2:
-        x_bins = np.array([d["cnf_clauses"].min(), d["cnf_clauses"].max() + 1.0])
+        x_bins = np.array([d["clause_density"].min(), d["clause_density"].max() + 1.0])
     if len(y_bins) < 2:
-        y_bins = np.array([d["clause_density"].min(), d["clause_density"].max() + 1.0])
-    d["xb"] = pd.cut(d["cnf_clauses"], bins=x_bins, include_lowest=True, duplicates="drop")
-    d["yb"] = pd.cut(d["clause_density"], bins=y_bins, include_lowest=True, duplicates="drop")
-    piv = d.pivot_table(index="yb", columns="xb", values="wall_ms", aggfunc="median")
+        y_bins = np.array([d["diversity_score"].min(), d["diversity_score"].max() + 1.0])
+    d["xb"] = pd.cut(d["clause_density"], bins=x_bins, include_lowest=True, duplicates="drop")
+    d["yb"] = pd.cut(d["diversity_score"], bins=y_bins, include_lowest=True, duplicates="drop")
+    piv = d.pivot_table(index="yb", columns="xb", values="time_per_call_ms", aggfunc="median")
     arr = piv.values
     plt.figure(figsize=(9, 5))
     im = plt.imshow(arr, aspect="auto", origin="lower")
-    plt.colorbar(im, label="median wall_ms")
+    plt.colorbar(im, label="median time_per_call_ms")
     plt.xticks(np.arange(len(piv.columns)), [str(c) for c in piv.columns], rotation=20, ha="right")
     plt.yticks(np.arange(len(piv.index)), [str(i) for i in piv.index])
-    plt.xlabel("cnf_clauses bucket")
-    plt.ylabel("clause_density bucket")
-    plt.title("median wall_ms by size-density regime")
+    plt.xlabel("clause_density bucket")
+    plt.ylabel("diversity_score bucket")
+    plt.title("time per solve by density and diversity")
     plt.tight_layout()
     plt.savefig(out_path)
     plt.close()
@@ -333,12 +289,9 @@ def main():
 
     plot_time_hist(ok_df, out_dir / "time_hist.png")
     plot_solve_calls_hist(ok_df, out_dir / "solve_calls_hist.png")
-    plot_time_vs_cnf(ok_df, out_dir / "time_vs_cnf.png")
-    plot_time_per_call_vs_density(ok_df, out_dir / "time_per_call_vs_density.png")
-    plot_timeout_rate_by_size(df, out_dir / "timeout_rate_by_size.png")
-    plot_top_slowest(ok_df, out_dir / "top_slowest.png")
+    plot_time_vs_cnf_size(ok_df, out_dir / "time_vs_cnf.png")
     plot_family_summary(ok_df, out_dir / "family_summary.png", min_n=5)
-    plot_regime_heatmap(ok_df, out_dir / "regime_heatmap.png")
+    plot_regime_density_diversity(ok_df, out_dir / "regime_heatmap.png")
     write_report(df, ok_df, out_dir / "report.md")
 
 
