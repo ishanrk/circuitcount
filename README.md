@@ -69,26 +69,64 @@ The merged benchmark has 30 instances. The median wall time is 0 ms. The p90 wal
 
 ## Figures
 
-The figures are generated from `results/results.csv` and stored at the following paths.
+The figures are generated from `results/results.csv` and `docs/fig/report.md`.
+
+```bash
+python scripts/plot_results.py --csv results/results.csv --out_dir docs/fig
+```
+
+`docs/fig/time_hist.png` shows wall time by CNF size bucket. This plot answers where lag appears by size regime and reports median and p90 in the title.
 
 ![time histogram](docs/fig/time_hist.png)
 
+`docs/fig/solve_calls_hist.png` shows solve call distribution by the same size buckets. This plot separates oracle intensity from per-call cost.
+
 ![solve calls histogram](docs/fig/solve_calls_hist.png)
 
+`docs/fig/time_vs_cnf.png` shows wall time versus CNF clauses with mode coloring and a binned median trend line.
+
 ![time vs cnf clauses](docs/fig/time_vs_cnf.png)
+
+`docs/fig/time_per_call_vs_density.png` shows per-call latency against clause density to highlight expensive solve regions.
+
+![time per call vs density](docs/fig/time_per_call_vs_density.png)
+
+`docs/fig/timeout_rate_by_size.png` shows status fractions by size bucket for failure concentration analysis.
+
+![timeout rate by size](docs/fig/timeout_rate_by_size.png)
+
+`docs/fig/top_slowest.png` shows the slowest instances with family and CNF size labels.
+
+![top slowest instances](docs/fig/top_slowest.png)
+
+`docs/fig/family_summary.png` shows median and p90 wall time by inferred family for families with at least five rows.
+
+![family summary](docs/fig/family_summary.png)
+
+`docs/fig/regime_heatmap.png` shows median wall time over a 2D regime grid of CNF size and clause density.
+
+![regime heatmap](docs/fig/regime_heatmap.png)
+
+The report values are dataset_rows=30, ok_rows=28, timeout_rows=0, median_wall_ms_ok=0.500, and p90_wall_ms_ok=1.000. The largest size bucket is (6.5, 11.0], with largest_bucket_median_wall_ms_ok=1.000 and largest_bucket_timeout_rate=0.000.
+
+Interpretation from the report and figures is that lag concentrates in the largest CNF bucket by wall time, timeout concentration is not present in this sample, time_per_call grows with clause_density in the upper-density region, and the aag family has lower median wall time than the bench family on this run.
 
 The required figure paths are `docs/fig/time_hist.png`, `docs/fig/solve_calls_hist.png`, and `docs/fig/time_vs_cnf.png`.
 
 ## References
 
-Schwartz, 1980, Journal of the ACM.
+Schwartz, Jacob T. Fast probabilistic algorithms for verification of polynomial identities. Journal of the ACM. 1980.
 
-Zippel, 1979, EUROSAM.
+Zippel, Richard. Probabilistic algorithms for sparse polynomials. EUROSAM. 1979.
 
-Fiat and Shamir, 1986, CRYPTO.
+Fiat, Amos and Shamir, Adi. How to prove yourself: practical solutions to identification and signature problems. CRYPTO. 1986.
 
-Merkle, 1987, CRYPTO.
+Merkle, Ralph C. A digital signature based on a conventional encryption function. CRYPTO. 1987.
 
-Chakraborty, Meel, and Vardi, 2013, CAV.
+Chakraborty, Supratik, Meel, Kuldeep S., and Vardi, Moshe Y. A scalable approximate model counter. CP. 2013.
 
-Chakraborty, Meel, and Vardi, 2016, IJCAI.
+Chakraborty, Supratik, Meel, Kuldeep S., and Vardi, Moshe Y. Algorithmic improvements in approximate counting for probabilistic inference: from linear to logarithmic SAT calls. IJCAI. 2016.
+
+Soos, Mate and Meel, Kuldeep S. BIRD: engineering an efficient cnf-xor sat solver and its applications to approximate model counting. AAAI. 2019.
+
+Biere, Armin. The AIGER and-inverter graph format version 20071012. FMV Report Series, JKU Linz. 2007.
