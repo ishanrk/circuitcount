@@ -10,6 +10,7 @@ clap = { version = "4", features = ["derive"] }
 indexmap = "2"
 rand = "0.9"
 rand_chacha = "0.9"
+varisat = "0.2"
 
 [dev-dependencies]
 proptest = "1"

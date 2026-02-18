@@ -9,7 +9,9 @@ use circuitcount::circuit::aiger::parse_aag_reader;
 use circuitcount::circuit::bench::parse_bench_reader;
 use circuitcount::cnf::dimacs::to_dimacs;
 use circuitcount::cnf::tseitin::encode_aig;
-use circuitcount::count::hash_count::{CountMode, count_output};
+use circuitcount::count::hash_count::{
+    CountBackend, CountMode, CountOptions, count_output_with_options,
+};
 
 #[derive(Debug, Parser)]
 #[command(name = "circuitcount")]
@@ -47,6 +49,12 @@ enum Cmd {
         trials: usize,
         #[arg(long, default_value_t = 0.35)]
         p: f64,
+        #[arg(long, default_value = "varisat")]
+        backend: String,
+        #[arg(long, default_value_t = false)]
+        progress: bool,
+        #[arg(long, default_value_t = 3)]
+        r: usize,
     },
 }
 
@@ -68,7 +76,10 @@ fn main() -> Result<()> {
             pivot,
             trials,
             p,
-        } => count_cmd(&path, out, seed, pivot, trials, p)?,
+            backend,
+            progress,
+            r,
+        } => count_cmd(&path, out, seed, pivot, trials, p, &backend, progress, r)?,
     }
     Ok(())
 }
@@ -147,9 +158,36 @@ fn cnf_cmd(path: &str, out: usize, assert1: bool, emit: &str) -> Result<()> {
     Ok(())
 }
 
-fn count_cmd(path: &str, out: usize, seed: u64, pivot: usize, trials: usize, p: f64) -> Result<()> {
+fn count_cmd(
+    path: &str,
+    out: usize,
+    seed: u64,
+    pivot: usize,
+    trials: usize,
+    p: f64,
+    backend: &str,
+    progress: bool,
+    r: usize,
+) -> Result<()> {
     let aig = load_aig(path)?;
-    let report = count_output(&aig, out, seed, pivot, trials, p)?;
+    let backend = match backend {
+        "dpll" => CountBackend::Dpll,
+        "varisat" => CountBackend::Varisat,
+        _ => bail!("unknown backend '{}', expected dpll|varisat", backend),
+    };
+    let report = count_output_with_options(
+        &aig,
+        out,
+        CountOptions {
+            seed,
+            pivot,
+            trials,
+            sparsity: p,
+            backend,
+            progress,
+            repeats: r,
+        },
+    )?;
     let mode = match report.mode {
         CountMode::Exact => "exact",
         CountMode::Hash => "hash",
@@ -159,8 +197,8 @@ fn count_cmd(path: &str, out: usize, seed: u64, pivot: usize, trials: usize, p: 
         report.inputs_coi, report.ands, report.vars, report.clauses, report.pivot, report.trials
     );
     println!(
-        "result={} mode={} m={}",
-        report.result, mode, report.m_used
+        "backend={} solve_calls={} mode={} result={} m={} trials={} r={}",
+        report.backend, report.solve_calls, mode, report.result, report.m_used, report.trials, r
     );
     Ok(())
 }

@@ -1,6 +1,7 @@
 use anyhow::Result;
 
 use crate::cnf::cnf::{Cnf, Lit};
+use crate::solver::IncrementalSolver;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct XorConstraint {
@@ -94,5 +95,80 @@ fn push_clause(cnf: &mut Cnf, mut clause: Vec<Lit>, act_var: Option<u32>) {
         cnf.add_clause(gated);
     } else {
         cnf.add_clause(clause);
+    }
+}
+
+pub fn append_xor_constraint_to_solver<S: IncrementalSolver + ?Sized>(
+    solver: &mut S,
+    constraint: &XorConstraint,
+    activation: Option<Lit>,
+) -> Result<()> {
+    if constraint.vars.is_empty() {
+        if constraint.rhs {
+            push_solver_clause(solver, Vec::new(), activation);
+        }
+        return Ok(());
+    }
+
+    if constraint.vars.len() == 1 {
+        push_solver_clause(
+            solver,
+            vec![Lit::new(constraint.vars[0], constraint.rhs)],
+            activation,
+        );
+        return Ok(());
+    }
+
+    let mut acc = constraint.vars[0];
+    for &next in &constraint.vars[1..] {
+        let out = solver.new_var();
+        append_xor3_solver(solver, acc, next, out, activation);
+        acc = out;
+    }
+    push_solver_clause(solver, vec![Lit::new(acc, constraint.rhs)], activation);
+    Ok(())
+}
+
+fn append_xor3_solver<S: IncrementalSolver + ?Sized>(
+    solver: &mut S,
+    x: u32,
+    y: u32,
+    z: u32,
+    activation: Option<Lit>,
+) {
+    push_solver_clause(
+        solver,
+        vec![Lit::new(x, true), Lit::new(y, true), Lit::new(z, false)],
+        activation,
+    );
+    push_solver_clause(
+        solver,
+        vec![Lit::new(x, false), Lit::new(y, false), Lit::new(z, false)],
+        activation,
+    );
+    push_solver_clause(
+        solver,
+        vec![Lit::new(x, true), Lit::new(y, false), Lit::new(z, true)],
+        activation,
+    );
+    push_solver_clause(
+        solver,
+        vec![Lit::new(x, false), Lit::new(y, true), Lit::new(z, true)],
+        activation,
+    );
+}
+
+fn push_solver_clause<S: IncrementalSolver + ?Sized>(
+    solver: &mut S,
+    mut clause: Vec<Lit>,
+    activation: Option<Lit>,
+) {
+    if let Some(act) = activation {
+        let mut scoped = Vec::with_capacity(clause.len() + 1);
+        scoped.push(act.neg());
+        scoped.append(&mut clause);
+        solver.add_clause(scoped);
+    } else {
+        solver.add_clause(clause);
     }
 }
