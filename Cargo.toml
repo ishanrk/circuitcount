@@ -8,6 +8,8 @@ anyhow = "1"
 thiserror = "2"
 clap = { version = "4", features = ["derive"] }
 indexmap = "2"
+rand = "0.9"
+rand_chacha = "0.9"
 
 [dev-dependencies]
 proptest = "1"

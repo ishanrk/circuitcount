@@ -99,6 +99,8 @@ dependencies = [
  "clap",
  "indexmap",
  "proptest",
+ "rand",
+ "rand_chacha",
  "thiserror",
 ]
 
