@@ -1,0 +1,16 @@
+path,status,backend,mode,wall_ms,solve_calls,result,m,trials,r,seed,file_bytes,aig_inputs,aig_ands,cone_inputs,cnf_vars,cnf_clauses
+datasets/sample/run15\aag_0000.aag,ok,dpll,exact,0,2,1,0,1,5,1,583,1,0,1,2,2
+datasets/sample/run15\aag_0001.aag,ok,dpll,exact,0,2,1,0,1,5,1,312,2,2,2,4,5
+datasets/sample/run15\aag_0002.aag,ok,dpll,exact,0,6,5,0,1,5,1,417,3,3,3,7,11
+datasets/sample/run15\aag_0003.aag,ok,dpll,exact,0,4,3,0,1,5,1,468,3,3,3,4,5
+datasets/sample/run15\aag_0004.aag,ok,dpll,exact,0,2,1,0,1,5,1,253,2,1,2,4,5
+datasets/sample/run15\aag_0005.aag,ok,dpll,exact,0,2,1,0,1,5,1,447,1,1,1,2,2
+datasets/sample/run15\aag_0006.aag,unsat,dpll,exact,0,1,0,0,1,5,1,435,4,5,4,10,17
+datasets/sample/run15\bench_0000.bench,ok,dpll,exact,0,4,3,0,1,5,1,508,2,1,2,4,5
+datasets/sample/run15\bench_0001.bench,ok,dpll,exact,1,3,2,0,1,5,1,1091,2,3,2,6,11
+datasets/sample/run15\bench_0002.bench,ok,dpll,exact,0,2,1,0,1,5,1,704,1,0,1,2,2
+datasets/sample/run15\bench_0003.bench,ok,dpll,exact,1,6,5,0,1,5,1,799,3,2,3,6,8
+datasets/sample/run15\bench_0004.bench,ok,dpll,exact,1,6,5,0,1,5,1,785,3,2,3,6,8
+datasets/sample/run15\bench_0005.bench,ok,dpll,exact,1,15,14,0,1,5,1,873,5,6,5,12,20
+datasets/sample/run15\bench_0006.bench,ok,dpll,exact,0,8,7,0,1,5,1,591,3,2,3,6,8
+datasets/sample/run15\bench_0007.bench,ok,dpll,exact,1,4,3,0,1,5,1,777,3,5,3,9,17

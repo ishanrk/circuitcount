@@ -170,11 +170,18 @@ fn count_cmd(
     r: usize,
 ) -> Result<()> {
     let aig = load_aig(path)?;
+    let backend_name = backend.to_string();
     let backend = match backend {
         "dpll" => CountBackend::Dpll,
         "varisat" => CountBackend::Varisat,
         _ => bail!("unknown backend '{}', expected dpll|varisat", backend),
     };
+    if progress {
+        println!(
+            "progress=begin path={} out={} backend={} pivot={} trials={} p={} r={}",
+            path, out, backend_name, pivot, trials, p, r
+        );
+    }
     let report = count_output_with_options(
         &aig,
         out,
@@ -200,5 +207,8 @@ fn count_cmd(
         "backend={} solve_calls={} mode={} result={} m={} trials={} r={}",
         report.backend, report.solve_calls, mode, report.result, report.m_used, report.trials, r
     );
+    if progress {
+        println!("progress=end mode={} m={} result={}", mode, report.m_used, report.result);
+    }
     Ok(())
 }

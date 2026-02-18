@@ -78,6 +78,7 @@ pub fn count_output_with_options(
     out_idx: usize,
     opts: CountOptions,
 ) -> Result<CountReport> {
+    let _ = opts.progress;
     if opts.trials == 0 {
         bail!("trials must be >= 1");
     }
@@ -135,9 +136,6 @@ pub fn count_output_with_options(
         let mut m = 1usize;
         while m <= max_m {
             let c = cell_count_with_prefix(&mut *solver, &proj, opts.pivot, &row_acts, m)?;
-            if opts.progress {
-                println!("trial={} stage=ramp m={} cell={}", t, m, c.count);
-            }
             if c.hit_cap {
                 low = m;
                 m = (m * 2).min(max_m + 1);
@@ -158,9 +156,6 @@ pub fn count_output_with_options(
         while lo <= hi {
             let mid = (lo + hi) / 2;
             let c = cell_count_with_prefix(&mut *solver, &proj, opts.pivot, &row_acts, mid)?;
-            if opts.progress {
-                println!("trial={} stage=bin m={} cell={}", t, mid, c.count);
-            }
             if c.hit_cap {
                 lo = mid + 1;
             } else if c.count == 0 {
@@ -183,13 +178,10 @@ pub fn count_output_with_options(
         };
 
         let mut cells = vec![first_cell.count as u128];
-        for rep in 1..opts.repeats {
+        for _rep in 1..opts.repeats {
             let rows = sample_constraints(&proj, m_pick, opts.sparsity, &mut rng)?;
             let acts = add_trial_rows(&mut *solver, &rows)?;
             let c = cell_count_with_prefix(&mut *solver, &proj, opts.pivot, &acts, m_pick)?;
-            if opts.progress {
-                println!("trial={} stage=rep m={} rep={} cell={}", t, m_pick, rep, c.count);
-            }
             cells.push(c.count as u128);
         }
         cells.sort_unstable();

@@ -1,3 +1,4 @@
+pub mod bench;
 pub mod circuit;
 pub mod cnf;
 pub mod count;
