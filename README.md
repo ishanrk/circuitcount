@@ -1,5 +1,8 @@
 # circuitcount
 
+<img width="470" height="242" alt="image" src="https://github.com/user-attachments/assets/93073cd2-6791-49dd-86f2-43ec8ab027da" />
+- An example of a logical circuit
+
 ## Overview
 
 This repository parses `.aag` and `.bench` circuits, builds an AIG, applies cone restriction and simplification, encodes to CNF with Tseitin clauses, and runs projected counting with exact and hash-cell modes. The benchmark artifacts in this repository were generated from `datasets/sample/` and stored in `results/` and `docs/fig/`.
