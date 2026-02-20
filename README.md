@@ -3,6 +3,12 @@
 <img width="470" height="242" alt="image" src="https://github.com/user-attachments/assets/93073cd2-6791-49dd-86f2-43ec8ab027da" />
 - An example of a logical circuit
 
+## Model Counting
+
+Model counting can be simply described as a method to count all satsifying solutions to a Boolean formula. This project tries to leverage the fact that certain Boolean formulas come pre-structured as logical circuits to apply some speedups to this model counting process, althought this is still a work in progress in terms of optimizing the process to compete with SOTA model counters. A very simple run of this program should be something like taking in a circuit as a .bench file or an and inverter graph to return the projected model count
+
+Applications are prevalent in cryptography and circuit synthesis.
+
 ## Overview
 
 This repository parses `.aag` and `.bench` circuits, builds an AIG, applies cone restriction and simplification, encodes to CNF with Tseitin clauses, and runs projected counting with exact and hash-cell modes. The benchmark artifacts in this repository were generated from `datasets/sample/` and stored in `results/` and `docs/fig/`. Most of the techniques used in this implementation were inspired using the references cited below and especially the model counters GANAK and ApproxMC.
