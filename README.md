@@ -1,4 +1,4 @@
-# circuitcount
+# circuitcount **Repository Migrated from a depreciated account to this account on Feb 2026**
 
 <img width="470" height="242" alt="image" src="https://github.com/user-attachments/assets/93073cd2-6791-49dd-86f2-43ec8ab027da" />
 - An example of a logical circuit
@@ -13,7 +13,6 @@ Applications are prevalent in cryptography and circuit synthesis.
 
 This repository parses `.aag` and `.bench` circuits, builds an AIG, applies cone restriction and simplification, encodes to CNF with Tseitin clauses, and runs projected counting with exact and hash-cell modes. The benchmark artifacts in this repository were generated from `datasets/sample/` and stored in `results/` and `docs/fig/`. Most of the techniques used in this implementation were inspired using the references cited below and especially the model counters GANAK and ApproxMC.
 
-**Repository Migrated from a depreciated account to this account on Feb 2026**
 
 ## Build
 
