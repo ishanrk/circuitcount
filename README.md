@@ -13,6 +13,8 @@ Applications are prevalent in cryptography and circuit synthesis.
 
 This repository parses `.aag` and `.bench` circuits, builds an AIG, applies cone restriction and simplification, encodes to CNF with Tseitin clauses, and runs projected counting with exact and hash-cell modes. The benchmark artifacts in this repository were generated from `datasets/sample/` and stored in `results/` and `docs/fig/`. Most of the techniques used in this implementation were inspired using the references cited below and especially the model counters GANAK and ApproxMC.
 
+Repository Migrated from a depreciated account to this account on Feb 2026.
+
 ## Build
 
 ```bash
@@ -28,6 +30,8 @@ cargo test
 The parser accepts AIGER ASCII with `.aag` extension and BENCH subset with `.bench` extension. The benchmark runner accepts `--format aag`, `--format bench`, and `--format auto`.
 
 ## Commands
+
+Commands to run the model counter and get the number of satisfying solutions with different flag examples.
 
 ```bash
 cargo run --bin circuitcount -- count "datasets/sample/run15/bench_0003.bench" --out 0 --seed 1 --pivot 4096 --trials 1 --p 0.35 --backend varisat --r 5
